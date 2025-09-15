@@ -111,7 +111,7 @@ export default function CategoryTreemap({ data }: CategoryTreemapProps) {
           ratio={4 / 3}
           stroke="#fff"
           fill="hsl(var(--primary))"
-          content={<CustomizedContent colors={COLORS} />}
+          content={(props: any) => <CustomizedContent {...props} colors={COLORS} />}
         >
           <Tooltip content={<CustomTooltip />} />
         </Treemap>
