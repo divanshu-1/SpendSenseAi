@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition, useCallback, ChangeEvent } from 'react';
+import { useState, useTransition, useCallback, ChangeEvent, useEffect } from 'react';
 import {
   categorizeTransactionsAction,
   detectAnomaliesAction,
@@ -16,7 +16,7 @@ import type {
 } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { UploadCloud, File as FileIcon, X, Loader2, Wand2, TestTube2, User } from 'lucide-react';
+import { UploadCloud, File as FileIcon, X, Loader2, Wand2, TestTube2, User, LogOut } from 'lucide-react';
 import Dashboard from '@/components/app/dashboard';
 import { Logo } from '@/components/app/logo';
 import { useToast } from '@/hooks/use-toast';
@@ -36,6 +36,22 @@ export default function Home() {
   const { toast } = useToast();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Check for existing user on component mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('spendsense_current_user');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error('Error parsing saved user:', error);
+        localStorage.removeItem('spendsense_current_user');
+      }
+    }
+  }, []);
 
   const resetState = () => {
     setView('upload');
@@ -276,8 +292,24 @@ export default function Home() {
   }
 
   const handleLoginSuccess = () => {
+    // Get the current user from localStorage
+    const savedUser = localStorage.getItem('spendsense_current_user');
+    if (savedUser) {
+      setCurrentUser(JSON.parse(savedUser));
+    }
     setIsLoggedIn(true);
     setIsLoginDialogOpen(false);
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('spendsense_current_user');
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+    resetState();
+    toast({
+      title: 'Logged Out',
+      description: 'You have been successfully logged out.',
+    });
   }
 
   const renderUploadView = () => (
@@ -418,10 +450,24 @@ export default function Home() {
             <Logo className="h-8 w-8 text-primary" />
             <span className="font-headline font-semibold text-xl text-white">SpendSense AI</span>
         </div>
-        <Button variant="ghost" size="icon" onClick={() => setIsLoginDialogOpen(true)}>
-            <User className="h-5 w-5" />
-            <span className="sr-only">Login</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          {isLoggedIn && currentUser ? (
+            <>
+              <span className="text-sm text-gray-300 hidden sm:block">
+                Welcome, {currentUser.email}
+              </span>
+              <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
+                <LogOut className="h-5 w-5" />
+                <span className="sr-only">Logout</span>
+              </Button>
+            </>
+          ) : (
+            <Button variant="ghost" size="icon" onClick={() => setIsLoginDialogOpen(true)}>
+              <User className="h-5 w-5" />
+              <span className="sr-only">Login</span>
+            </Button>
+          )}
+        </div>
       </header>
       <main className="flex-grow">
         {renderContent()}
