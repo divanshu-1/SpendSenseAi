@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@auth/core": "^0.34.2",
     "@genkit-ai/googleai": "^1.14.1",
     "@genkit-ai/next": "^1.14.1",
     "@hookform/resolvers": "^4.1.3",
@@ -47,6 +48,7 @@
     "jspdf": "^2.5.1",
     "lucide-react": "^0.475.0",
     "next": "15.3.3",
+    "next-auth": "^4.24.11",
     "patch-package": "^8.0.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",

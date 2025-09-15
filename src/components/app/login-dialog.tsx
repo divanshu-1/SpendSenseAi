@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import {
   Dialog,
   DialogContent,
@@ -94,16 +95,21 @@ export default function LoginDialog({ isOpen, onClose, onLoginSuccess }: LoginDi
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
 
-    // Simulate Google OAuth flow
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
     try {
-      // Mock Google sign in - always succeeds
-      toast({
-        title: 'Google Sign In Successful',
-        description: "Welcome to SpendSense AI! Let's analyze your spending.",
+      const result = await signIn('google', {
+        redirect: false,
+        callbackUrl: '/'
       });
-      onLoginSuccess();
+
+      if (result?.ok) {
+        toast({
+          title: 'Google Sign In Successful',
+          description: "Welcome to SpendSense AI! Let's analyze your spending.",
+        });
+        onLoginSuccess();
+      } else {
+        throw new Error('Sign in failed');
+      }
     } catch (error) {
       toast({
         variant: 'destructive',
