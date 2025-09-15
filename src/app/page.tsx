@@ -42,6 +42,12 @@ export default function Home() {
     setDashboardData(null);
     setError(null);
     setFile(null);
+    setIsDragOver(false);
+    // Reset any pending transitions
+    if (isPending) {
+      // Force reset of transition state
+      window.location.reload();
+    }
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +82,11 @@ export default function Home() {
       try {
         setView('loading');
         setError(null);
+
+        // Check if API key is configured
+        if (!process.env.NEXT_PUBLIC_GOOGLE_GENAI_API_KEY && typeof window !== 'undefined') {
+          console.warn('Google AI API key not found in environment variables');
+        }
         
         let transactions: Transaction[];
         let rawData: string;
@@ -212,23 +223,35 @@ export default function Home() {
         });
         setView('dashboard');
       } catch (e: any) {
-        console.error(e);
-        setError(
-          e.message || 'An unexpected error occurred during processing.'
-        );
+        console.error('Processing error:', e);
+        const errorMessage = e.message || 'An unexpected error occurred during processing.';
+        setError(errorMessage);
         setView('error');
+
+        // Reset file state on error to prevent getting stuck
+        setFile(null);
+
         toast({
           variant: 'destructive',
           title: 'Processing Failed',
-          description: e.message || 'Please check the file and try again.',
+          description: errorMessage.includes('API') ? 'Please check your API key configuration and try again.' : 'Please check the file and try again.',
         });
       }
     });
   };
 
   const handleProcessFile = () => {
+    console.log('handleProcessFile called, file:', file);
     if (file) {
+      console.log('Processing file:', file.name, file.type);
       processData(file);
+    } else {
+      console.log('No file selected');
+      toast({
+        variant: 'destructive',
+        title: 'No File Selected',
+        description: 'Please select a CSV or PDF file to analyze.',
+      });
     }
   };
   
@@ -238,7 +261,10 @@ export default function Home() {
         const data = await response.text();
         const sampleFile = new File([data], "sample-transactions.csv", { type: "text/csv" });
         setFile(sampleFile);
-        await processData(sampleFile);
+        toast({
+            title: "Sample data loaded!",
+            description: "Click 'Analyze Transactions' to process the data.",
+        });
     } catch(e: any) {
         console.error("Failed to load sample data", e);
         toast({
@@ -283,7 +309,12 @@ export default function Home() {
           <div className="mt-6 p-4 bg-muted/50 rounded-lg flex items-center justify-between">
             <div className="flex items-center gap-3">
               <FileIcon className="h-5 w-5 text-muted-foreground" />
-              <span className="font-medium">{file.name}</span>
+              <div className="flex flex-col">
+                <span className="font-medium text-foreground">{file.name}</span>
+                <span className="text-sm text-muted-foreground">
+                  {file.name === 'sample-transactions.csv' ? 'Sample data ready for analysis' : 'File ready for analysis'}
+                </span>
+              </div>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setFile(null)}>
               <X className="h-4 w-4" />
@@ -292,11 +323,31 @@ export default function Home() {
         )}
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-            <Button size="lg" onClick={handleProcessFile} disabled={!file || isPending}>
-                <Wand2 className="mr-2 h-5 w-5" />
-                Analyze Transactions
+            <Button
+              size="lg"
+              onClick={handleProcessFile}
+              disabled={isPending}
+              className="bg-primary hover:bg-primary/90 disabled:opacity-50"
+            >
+                {isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="mr-2 h-5 w-5" />
+                    Analyze Transactions
+                  </>
+                )}
             </Button>
-            <Button size="lg" variant="outline" onClick={handleUseSampleData} disabled={isPending}>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={handleUseSampleData}
+              disabled={isPending}
+              className="border-primary text-primary hover:bg-primary/10"
+            >
                 <TestTube2 className="mr-2 h-5 w-5" />
                 Try with Sample Data
             </Button>
@@ -309,10 +360,10 @@ export default function Home() {
       return (
         <div className="flex items-center justify-center min-h-[80vh]">
           <div className="text-center max-w-4xl mx-auto px-4">
-            <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-500 to-accent mb-6">
+            <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-400 to-accent mb-6">
                 SpendSense AI
             </h1>
-            <p className="mt-6 text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="mt-6 text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
                 Smarter Spending, Better Saving. Turn your transaction data into actionable financial insights.
             </p>
             <div className="mt-10">
@@ -365,7 +416,7 @@ export default function Home() {
       <header className="p-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
             <Logo className="h-8 w-8 text-primary" />
-            <span className="font-headline font-semibold text-xl">SpendSense AI</span>
+            <span className="font-headline font-semibold text-xl text-white">SpendSense AI</span>
         </div>
         <Button variant="ghost" size="icon" onClick={() => setIsLoginDialogOpen(true)}>
             <User className="h-5 w-5" />

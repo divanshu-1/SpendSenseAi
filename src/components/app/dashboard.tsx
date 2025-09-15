@@ -95,10 +95,10 @@ export default function Dashboard({ data, onReset }: DashboardProps) {
     <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <Button variant="ghost" onClick={onReset} className="mb-2">
+          <Button variant="ghost" onClick={onReset} className="mb-2 text-gray-300 hover:text-white">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Upload
           </Button>
-          <h1 className="text-3xl font-bold font-headline">Your Financial Dashboard</h1>
+          <h1 className="text-3xl font-bold font-headline text-white">Your Financial Dashboard</h1>
         </div>
         <div className="flex gap-2">
           <Button onClick={handleExportPDF} disabled={isExporting}>
