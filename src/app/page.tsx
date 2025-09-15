@@ -319,8 +319,8 @@ export default function Home() {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           className={cn(
-            "relative flex flex-col items-center justify-center w-full p-8 md:p-12 border-2 border-dashed rounded-xl transition-colors duration-300",
-            isDragOver ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
+            "relative flex flex-col items-center justify-center w-full p-8 md:p-12 border-2 border-dashed rounded-xl transition-colors duration-300 backdrop-blur-sm bg-black/20",
+            isDragOver ? "border-yellow-400 bg-yellow-400/10" : "border-gray-400/30 hover:border-yellow-400/50"
           )}
         >
           <div className="absolute inset-0 bg-grid-slate-100/[0.05] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
@@ -392,10 +392,10 @@ export default function Home() {
       return (
         <div className="flex items-center justify-center min-h-[80vh]">
           <div className="text-center max-w-4xl mx-auto px-4">
-            <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-400 to-accent mb-6">
+            <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-blue-400 to-purple-400 mb-6">
                 SpendSense AI
             </h1>
-            <p className="mt-6 text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            <p className="mt-6 text-lg md:text-xl lg:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
                 Smarter Spending, Better Saving. Turn your transaction data into actionable financial insights.
             </p>
             <div className="mt-10">
@@ -443,11 +443,13 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-background dark:bg-grid-white/[0.05] bg-grid-black/[0.02]">
-      <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
-      <header className="p-4 flex justify-between items-center">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/20 via-purple-900/10 to-slate-900/30"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-600/10 via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-600/10 via-transparent to-transparent"></div>
+      <header className="relative z-10 p-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
-            <Logo className="h-8 w-8 text-primary" />
+            <Logo className="h-8 w-8 text-yellow-400" />
             <span className="font-headline font-semibold text-xl text-white">SpendSense AI</span>
         </div>
         <div className="flex items-center gap-2">
