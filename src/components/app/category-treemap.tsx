@@ -109,7 +109,6 @@ export default function CategoryTreemap({ data }: CategoryTreemapProps) {
         <Treemap
           data={chartData}
           dataKey="value"
-          ratio={4 / 3}
           stroke="#fff"
           fill="hsl(var(--primary))"
           content={CustomizedContent as any}
