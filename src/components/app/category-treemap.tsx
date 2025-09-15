@@ -34,7 +34,8 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 const CustomizedContent = (props: any) => {
-  const { root, depth, x, y, width, height, index, colors, name, value } = props;
+  const { root, depth, x, y, width, height, index, name, value } = props;
+  const colors = COLORS;
 
   // Only render labels for top-level categories
   if (depth > 1) {
@@ -111,7 +112,7 @@ export default function CategoryTreemap({ data }: CategoryTreemapProps) {
           ratio={4 / 3}
           stroke="#fff"
           fill="hsl(var(--primary))"
-          content={(props: any) => <CustomizedContent {...props} colors={COLORS} />}
+          content={CustomizedContent as any}
         >
           <Tooltip content={<CustomTooltip />} />
         </Treemap>
