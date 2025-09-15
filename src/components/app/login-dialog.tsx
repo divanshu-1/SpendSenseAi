@@ -33,42 +33,86 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function LoginDialog({ isOpen, onClose, onLoginSuccess }: LoginDialogProps) {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('password'); // Mock password
+  const [password, setPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    setIsLoading(true);
+    setError('');
+
     // Basic validation
     if (!email) {
       setError('Please enter your email address.');
+      setIsLoading(false);
       return;
     }
-    // Simple mock login logic - we'll just check for the test email
-    if (email === 'test@example.com') {
+
+    if (!password && !isSignUp) {
+      setError('Please enter your password.');
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    try {
+      if (isSignUp) {
+        // Mock sign up - accept any email
+        toast({
+          title: 'Account Created!',
+          description: "Welcome to SpendSense AI! Let's analyze your spending.",
+        });
+        onLoginSuccess();
+      } else {
+        // Mock login - accept test@example.com or any email with password "password"
+        if (email === 'test@example.com' || password === 'password') {
+          toast({
+            title: 'Login Successful',
+            description: "Welcome back! Let's analyze your spending.",
+          });
+          onLoginSuccess();
+        } else {
+          throw new Error('Invalid credentials');
+        }
+      }
+    } catch (error) {
       toast({
-        title: 'Login Successful',
-        description: "Welcome back! Let's analyze your spending.",
-      });
-      onLoginSuccess();
-    } else {
-       toast({
         variant: 'destructive',
-        title: 'Login Failed',
+        title: isSignUp ? 'Sign Up Failed' : 'Login Failed',
         description: 'Invalid credentials. Please try again.',
       });
       setError('Invalid credentials. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
   
-  const handleGoogleSignIn = () => {
-    // For now, we'll just log in the test user
-    setEmail('test@example.com');
-    setPassword('password');
-    toast({
-        title: 'Login Successful',
-        description: "Welcome back! Let's analyze your spending.",
-    });
-    onLoginSuccess();
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+
+    // Simulate Google OAuth flow
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    try {
+      // Mock Google sign in - always succeeds
+      toast({
+        title: 'Google Sign In Successful',
+        description: "Welcome to SpendSense AI! Let's analyze your spending.",
+      });
+      onLoginSuccess();
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Google Sign In Failed',
+        description: 'Please try again.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -77,16 +121,21 @@ export default function LoginDialog({ isOpen, onClose, onLoginSuccess }: LoginDi
         <DialogHeader className="text-center items-center">
             <Logo className="h-10 w-10 text-primary" />
           <DialogTitle className="text-3xl font-bold font-headline mt-4">
-            Welcome to SpendSense
+            {isSignUp ? 'Create Account' : 'Welcome Back'}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Log in or sign up (it's free)
+            {isSignUp ? 'Sign up to start analyzing your spending' : 'Log in to continue to SpendSense AI'}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
-            <Button variant="outline" className="w-full gap-2" onClick={handleGoogleSignIn}>
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
+            >
                 <GoogleIcon className="h-5 w-5"/>
-                Sign in with Google
+                {isLoading ? 'Signing in...' : 'Continue with Google'}
             </Button>
 
             <div className="flex items-center gap-2">
@@ -95,24 +144,80 @@ export default function LoginDialog({ isOpen, onClose, onLoginSuccess }: LoginDi
                 <div className="h-px w-full bg-border" />
             </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="email" className="text-xs font-semibold uppercase text-muted-foreground">
-              Email Address *
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="bg-background"
-            />
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email" className="text-xs font-semibold uppercase text-muted-foreground">
+                Email Address *
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="bg-background"
+                disabled={isLoading}
+              />
+            </div>
+
+            {!isSignUp && (
+              <div className="grid gap-2">
+                <Label htmlFor="password" className="text-xs font-semibold uppercase text-muted-foreground">
+                  Password *
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="bg-background"
+                  disabled={isLoading}
+                />
+              </div>
+            )}
           </div>
+
           {error && <p className="text-sm text-destructive text-center">{error}</p>}
+
+          <div className="text-center space-y-2">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError('');
+                setPassword('');
+              }}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              disabled={isLoading}
+            >
+              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+            </button>
+
+            {!isSignUp && (
+              <p className="text-xs text-muted-foreground">
+                Demo: Use <code className="bg-muted px-1 rounded">test@example.com</code> or any email with password <code className="bg-muted px-1 rounded">password</code>
+              </p>
+            )}
+          </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleLogin} className="w-full h-11 bg-primary/90 hover:bg-primary text-primary-foreground font-bold">
-            Continue <ArrowRight className="ml-2 h-4 w-4" />
+          <Button
+            onClick={handleLogin}
+            className="w-full h-11 bg-primary/90 hover:bg-primary text-primary-foreground font-bold"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                {isSignUp ? 'Creating Account...' : 'Signing In...'}
+              </>
+            ) : (
+              <>
+                {isSignUp ? 'Create Account' : 'Sign In'}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -307,16 +307,20 @@ export default function Home() {
   const renderContent = () => {
     if (!isLoggedIn) {
       return (
-        <div className="text-center">
-            <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-500 to-accent">
+        <div className="flex items-center justify-center min-h-[80vh]">
+          <div className="text-center max-w-4xl mx-auto px-4">
+            <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-500 to-accent mb-6">
                 SpendSense AI
             </h1>
-            <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="mt-6 text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                 Smarter Spending, Better Saving. Turn your transaction data into actionable financial insights.
             </p>
-            <div className="mt-8">
-              <Button size="lg" onClick={() => setIsLoginDialogOpen(true)}>Get Started</Button>
+            <div className="mt-10">
+              <Button size="lg" className="px-8 py-4 text-lg" onClick={() => setIsLoginDialogOpen(true)}>
+                Get Started
+              </Button>
             </div>
+          </div>
         </div>
       );
     }
@@ -368,7 +372,7 @@ export default function Home() {
             <span className="sr-only">Login</span>
         </Button>
       </header>
-      <main className="container mx-auto px-4 py-8 flex-grow flex items-center justify-center">
+      <main className="flex-grow">
         {renderContent()}
       </main>
       <LoginDialog
